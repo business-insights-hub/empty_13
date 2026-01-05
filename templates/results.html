@@ -19,8 +19,7 @@
             <div class="answer-sources">
                 <strong>📚 Mənbələr:</strong>
                 <div class="sources-list">
-                    {% set sources = parts[1] | trim | replace(' | ', '|') | split('|') %}
-                    {% for source in sources %}
+                    {% for source in parts[1].split('|') %}
                         <div class="source-item">{{ source | trim }}</div>
                     {% endfor %}
                 </div>

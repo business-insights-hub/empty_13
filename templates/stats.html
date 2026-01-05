@@ -18,7 +18,7 @@
             <div class="stat-icon">🔗</div>
             <div class="stat-content">
                 <div class="stat-value">{{ stats.neo4j_relationships }}</div>
-                <div class="stat-title">Qrafik Əlaqələri</div>
+                <div class="stat-title">Əlaqələr</div>
                 <div class="stat-desc">Məlumatlar arasında müəyyən edilmiş əlaqələr</div>
             </div>
         </div>
@@ -44,10 +44,10 @@
         </div>
 
         <div class="info-card">
-            <h3>🤖 AI Model</h3>
+            <h3>🤖 AI Modeli</h3>
             <ul>
-                <li><strong>LLM:</strong> Ollama (gemma:2b)</li>
-                <li><strong>Embeddinq:</strong> Hash-based (Demo)</li>
+                <li><strong>LLM:</strong> Ollama Llama 3.1</li>
+                <li><strong>Embeddinq:</strong> Nomic Embed Text (768D)</li>
                 <li><strong>Dil:</strong> Azərbaycan dili</li>
             </ul>
         </div>
@@ -56,8 +56,8 @@
             <h3>📚 Sənədlər</h3>
             <ul>
                 <li><strong>Ümumi sənəd:</strong> 6 PDF</li>
-                <li><strong>İşlənmiş chunk:</strong> ~28</li>
-                <li><strong>Dil:</strong> Azərbaycan</li>
+                <li><strong>Vektor sayı:</strong> {{ stats.pinecone_vectors }}</li>
+                <li><strong>Məlumat vahidi:</strong> {{ stats.neo4j_nodes }}</li>
             </ul>
         </div>
     </div>
