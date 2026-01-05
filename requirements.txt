@@ -1,0 +1,35 @@
+# Graph RAG Core Dependencies
+neo4j==5.15.0
+pinecone-client==3.0.2
+langchain==0.1.4
+langchain-community==0.0.16
+
+# LLM Integration
+ollama==0.1.6
+
+# Document Processing
+pypdf==3.17.4
+pymupdf==1.23.8
+python-docx==1.1.0
+unstructured==0.11.8
+
+# Embeddings
+sentence-transformers==2.3.1
+
+# Text Processing
+spacy==3.7.2
+nltk==3.8.1
+
+# Utilities
+python-dotenv==1.0.0
+pydantic==2.5.3
+tqdm==4.66.1
+numpy==1.26.3
+pandas==2.1.4
+
+# API and Web
+requests==2.31.0
+httpx==0.25.2
+
+# Logging and Monitoring
+loguru==0.7.2
