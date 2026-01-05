@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="results-page">
+    <div class="query-section">
+        <h2>📝 Sizin Sualınız:</h2>
+        <div class="query-box">{{ query }}</div>
+        <a href="/" class="btn-secondary">← Yeni axtarış</a>
+    </div>
+
+    <div class="answer-section">
+        <h2>💡 Cavab:</h2>
+        <div class="answer-box">
+            {{ answer }}
+        </div>
+    </div>
+
+    {% if vector_results %}
+    <div class="vector-results">
+        <h2>📊 Vektor Axtarışı Nəticələri:</h2>
+        {% for result in vector_results %}
+        <div class="result-card">
+            <div class="result-header">
+                <span class="result-score">Oxşarlıq: {{ "%.2f"|format(result.score * 100) }}%</span>
+                <span class="result-source">{{ result.metadata.get('original_filename', result.metadata.get('doc_id', 'Sənəd')) }}</span>
+            </div>
+            <div class="result-text">
+                {{ result.metadata.get('text', 'Mətn mövcud deyil')[:500] }}
+                {% if result.metadata.get('text', '')|length > 500 %}...{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if graph_results %}
+    <div class="graph-results">
+        <h2>🔗 Qrafik Nəticələri:</h2>
+        {% for result in graph_results %}
+        <div class="graph-card">
+            <div class="entity-name">{{ result.entity }}</div>
+            <div class="entity-types">
+                {% for type in result.types %}
+                <span class="entity-badge">{{ type }}</span>
+                {% endfor %}
+            </div>
+            {% if result.related_entities %}
+            <div class="related-entities">
+                <strong>Əlaqəli:</strong>
+                {% for rel in result.related_entities %}
+                    {% if rel %}
+                        <span class="related-tag">{{ rel }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="stats-mini">
+        <p>📊 Sistem Statusu: {{ stats.neo4j_nodes }} məlumat | {{ stats.pinecone_vectors }} vektor</p>
+    </div>
+</div>
+{% endblock %}

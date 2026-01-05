@@ -1,382 +1,255 @@
-# Graph RAG Agricultural Assistant
+# 🌾 AgriBot - Kənd Təsərrüfatı Bilgi Sistemi
 
-A sophisticated Graph RAG (Retrieval-Augmented Generation) system for agricultural knowledge management and question answering. This system combines the power of knowledge graphs with vector embeddings to provide accurate, context-aware answers to agricultural questions.
+**Azərbaycan dilində kənd təsərrüfatı RAG (Retrieval-Augmented Generation) sistemi**
 
-## Architecture
+Graph RAG texnologiyası ilə işləyən ağıllı kənd təsərrüfatı axtarış sistemi. Bu sistem Neo4j qrafik verilənlər bazası, Pinecone vektor verilənlər bazası və Ollama LLM inteqrasiyası ilə hərtərəfli cavablar təqdim edir.
 
-The system uses a hybrid approach:
+## 🎯 Xüsusiyyətlər
 
-1. **Vector Search** (Pinecone): Fast semantic search over document chunks
-2. **Knowledge Graph** (Neo4j): Structured relationships between agricultural entities
-3. **LLM** (Ollama): Entity extraction and answer generation
-4. **Embeddings** (Llama Text Embed v2): High-quality text embeddings
+- ✅ **Azərbaycan dili dəstəyi**: Tam Azərbaycan dilində interfeys və sorğu imkanı
+- ✅ **Hibrid axtarış**: Vektor oxşarlığı + Qrafik traversal
+- ✅ **6 kənd təsərrüfatı sənədi**: PDF formatında Azərbaycan dilində məlumatlar
+- ✅ **FastAPI web interfeysi**: Modern və responsiv dizayn
+- ✅ **Docker dəstəyi**: Asan yerləşdirmə və test
+- ✅ **Real-time AI cavabları**: Ollama gemma:2b modeli
 
-### How It Works
+## 📊 Texniki Arxitektura
 
 ```
-Documents (PDFs)
-    ↓
-PDF Processing & Chunking
-    ↓
-Entity Extraction (LLM) → Knowledge Graph (Neo4j)
-    ↓
-Text Embeddings → Vector Store (Pinecone)
-    ↓
-Query → Hybrid Retrieval (Vector + Graph)
-    ↓
-Answer Generation (LLM)
+┌─────────────────────────────────────────────────┐
+│           FastAPI Web Interface                 │
+│         (Jinja2 Templates + CSS)                │
+└───────────────────┬─────────────────────────────┘
+                    │
+┌───────────────────▼─────────────────────────────┐
+│         SimpleGraphRAG Core                     │
+│  (demo_graph_rag.py)                           │
+└──┬──────────────────────────────────────────┬───┘
+   │                                          │
+┌──▼───────────────────┐        ┌────────────▼──────┐
+│   Neo4j Graph DB     │        │  Pinecone Vector  │
+│   - 24 Entities      │        │  - 47 Vectors     │
+│   - 2 Relationships  │        │  - 1024 dim       │
+└──────────────────────┘        └───────────────────┘
+           │
+     ┌─────▼──────┐
+     │   Ollama   │
+     │  gemma:2b  │
+     └────────────┘
 ```
 
-## Features
+## 🚀 Tez Başlanğıc
 
-- **Document Ingestion**: Process agricultural PDFs and extract knowledge
-- **Entity Recognition**: Automatically identify crops, diseases, pests, techniques, etc.
-- **Knowledge Graph**: Build structured relationships between entities
-- **Hybrid Search**: Combine semantic search with graph traversal
-- **Conversational AI**: Chat interface with context awareness
-- **Entity Explorer**: Search and explore entities in the knowledge graph
-
-## Prerequisites
-
-### 1. Neo4j Aura (Cloud Graph Database)
-
-Already configured in `.env` file.
-
-### 2. Pinecone (Vector Database)
-
-Already configured in `.env` file.
-
-### 3. Ollama (Local LLM)
-
-Install Ollama from [ollama.ai](https://ollama.ai)
+### Metod 1: Docker (Tövsiyə edilir)
 
 ```bash
-# macOS
-brew install ollama
+# 1. Reponu klonlayın
+git clone https://github.com/Ismat-Samadov/agri_bot.git
+cd agri_bot
 
-# Start Ollama
+# 2. .env faylını konfiqurasiya edin (artıq mövcuddur)
+# NEO4J_URI, PINECONE_API_KEY və s.
+
+# 3. Docker Compose ilə başladın
+docker-compose up -d
+
+# 4. Ollama modelini yükləyin (ilk dəfə)
+docker exec -it agribot-ollama ollama pull gemma:2b
+
+# 5. Brauzerə keçin
+open http://localhost:8000
+```
+
+### Metod 2: Local Quraşdırma
+
+```bash
+# 1. Virtual mühit yaradın
+python3 -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate    # Windows
+
+# 2. Asılılıqları quraşdırın
+pip install -r requirements-simple.txt
+
+# 3. Ollama quraşdırın və başladın (ayrıca terminal)
+brew install ollama  # macOS
 ollama serve
+ollama pull gemma:2b
 
-# Pull the model (in a new terminal)
-ollama pull llama3.1
+# 4. Web serveri başladın
+python app.py
+
+# 5. Brauzerə keçin
+open http://localhost:8000
 ```
 
-## Installation
-
-1. **Clone and navigate to the project**:
-```bash
-cd /Users/ismatsamadov/agri_bot
-```
-
-2. **Create virtual environment**:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**:
-```bash
-pip install -r requirements.txt
-```
-
-4. **Verify environment variables** (already set in `.env`):
-```bash
-cat .env
-```
-
-## Usage
-
-### Quick Start
-
-Run the main script:
-```bash
-python main.py
-```
-
-This will show a menu with options:
-1. Ingest documents from dataset folder
-2. Run example queries
-3. Search for entities
-4. Get entity details
-5. View system statistics
-6. Interactive chat mode
-
-### 1. Ingest Documents
-
-First, ingest your agricultural PDFs:
-
-```python
-from src.graph_rag.graph_rag import GraphRAG
-
-with GraphRAG() as graph_rag:
-    # Ingest all PDFs from dataset directory
-    stats = graph_rag.ingest_directory("dataset")
-    print(stats)
-```
-
-This will:
-- Extract text from PDFs
-- Chunk documents into manageable pieces
-- Extract entities and relationships using LLM
-- Build knowledge graph in Neo4j
-- Store embeddings in Pinecone
-
-### 2. Query the System
-
-```python
-from src.graph_rag.graph_rag import GraphRAG
-
-with GraphRAG() as graph_rag:
-    answer = graph_rag.query("What are the main crops mentioned?")
-    print(answer)
-```
-
-### 3. Interactive Chat
-
-```python
-from src.graph_rag.graph_rag import GraphRAG
-
-with GraphRAG() as graph_rag:
-    conversation_history = []
-
-    question = "What diseases affect wheat?"
-    answer = graph_rag.chat(question, conversation_history)
-    print(answer)
-```
-
-### 4. Search Entities
-
-```python
-from src.graph_rag.graph_rag import GraphRAG
-
-with GraphRAG() as graph_rag:
-    entities = graph_rag.search_entities("wheat", limit=5)
-
-    for entity in entities:
-        print(f"- {entity['properties']['name']}")
-```
-
-### 5. Get Entity Details
-
-```python
-from src.graph_rag.graph_rag import GraphRAG
-
-with GraphRAG() as graph_rag:
-    details = graph_rag.get_entity_details("Wheat", "Crop")
-
-    print(f"Entity: {details['entity']['name']}")
-    print(f"Related: {len(details['related_entities'])} entities")
-```
-
-## Project Structure
+## 📁 Layihə Strukturu
 
 ```
 agri_bot/
-├── .env                          # Environment variables (credentials)
-├── .gitignore                    # Git ignore file
-├── requirements.txt              # Python dependencies
-├── README.md                     # This file
-├── main.py                       # Example usage script
-├── dataset/                      # Agricultural PDF documents
-│   └── *.pdf
-└── src/
-    └── graph_rag/
-        ├── __init__.py
-        ├── graph_rag.py          # Main orchestrator
-        ├── graph_builder.py      # Knowledge graph builder
-        ├── handlers/
-        │   ├── neo4j_handler.py     # Neo4j connection
-        │   ├── pinecone_handler.py  # Pinecone connection
-        │   └── ollama_handler.py    # Ollama LLM
-        ├── extractors/
-        │   └── entity_extractor.py  # Entity extraction
-        └── retrievers/
-            └── hybrid_retriever.py  # Hybrid search
+├── app.py                      # FastAPI ana tətbiq
+├── demo_graph_rag.py          # Graph RAG əsas sinif
+├── requirements-simple.txt    # Python asılılıqları
+├── Dockerfile                 # Docker konfiqurasiyası
+├── docker-compose.yml         # Docker Compose konfiqurasiyası
+├── .env                       # Mühit dəyişənləri (Git-də yoxdur)
+├── .gitignore                 # Git təhlükəsizliyi
+│
+├── templates/                 # Jinja2 şablonları
+│   ├── base.html
+│   ├── index.html            # Ana səhifə
+│   ├── results.html          # Axtarış nəticələri
+│   ├── stats.html            # Statistika səhifəsi
+│   └── error.html            # Xəta səhifəsi
+│
+├── static/
+│   └── css/
+│       └── style.css         # Dizayn və stilizasiya
+│
+├── dataset/                   # Kənd təsərrüfatı PDF-ləri (6 sənəd)
+│
+└── scripts/                   # Bir dəfəlik skriptlər
+    ├── test_simple.py        # Sistem testləri
+    └── ingest_all_docs.py    # Sənəd yüklənməsi
 ```
 
-## Components
+## 🗄️ Verilənlər Bazası Konfiqurasiyası
 
-### Neo4j Handler
+### Neo4j Aura (Cloud)
+- **URI**: `neo4j+s://9c0a7d96.databases.neo4j.io`
+- **İstifadəçi**: neo4j
+- **Status**: ✅ Aktiv (24 node, 2 relationship)
 
-Manages graph database operations:
-- Create entity nodes
-- Create relationships
-- Search entities
-- Graph traversal
-- Custom Cypher queries
+### Pinecone
+- **İndeks**: agribot
+- **Ölçü**: 1024
+- **Model**: llama-text-embed-v2
+- **Status**: ✅ Aktiv (47 vektor)
 
-### Pinecone Handler
+### Ollama
+- **Model**: gemma:2b
+- **Dil**: Çoxdilli (Azərbaycan dili dəstəyi)
+- **Yerləşmə**: Local (http://localhost:11434)
 
-Manages vector database operations:
-- Store document embeddings
-- Semantic search
-- Hybrid filtering
+## 💡 İstifadə
 
-### Ollama Handler
+### Web İnterfeys
 
-Manages LLM operations:
-- Entity extraction
-- Question answering
-- Answer synthesis
+1. **Ana səhifə** (`/`): Axtarış qutusu və statistika
+2. **Axtarış nəticələri** (`/search`): AI cavablar və mənbələr
+3. **Statistika** (`/stats`): Sistem məlumatları
 
-### Entity Extractor
+### Nümunə Suallar
 
-Processes documents:
-- PDF text extraction
-- Document chunking
-- Entity and relationship extraction
+```
+Taxılın əsas xəstəlikləri hansılardır?
+Bitkiçilikdə hansı metodlar tətbiq olunur?
+Kənd təsərrüfatında kimyəvi maddələr haqqında məlumat verin
+```
 
-### Knowledge Graph Builder
+## 🔧 Konfiqurasiya
 
-Builds the graph:
-- Create entities from extractions
-- Create relationships
-- Deduplicate entities
-- Link documents to entities
+### Mühit Dəyişənləri (.env)
 
-### Hybrid Retriever
-
-Combines search methods:
-- Vector similarity search
-- Graph traversal from entities
-- Result re-ranking
-
-## Configuration
-
-All configuration is in `.env`:
-
-```bash
+```env
 # Neo4j
-NEO4J_URI=neo4j+s://9c0a7d96.databases.neo4j.io
+NEO4J_URI=neo4j+s://your-instance.databases.neo4j.io
 NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=your_password
-NEO4J_DATABASE=neo4j
+NEO4J_PASSWORD=your-password
 
 # Pinecone
-PINECONE_API_KEY=your_api_key
+PINECONE_API_KEY=your-api-key
 PINECONE_INDEX_NAME=agribot
-PINECONE_ENVIRONMENT=us-east-1
+PINECONE_DIMENSIONS=1024
 
-# Embedding
-EMBEDDING_MODEL=llama-text-embed-v2
-
-# Ollama (optional, defaults to localhost)
+# Ollama (local)
 OLLAMA_HOST=http://localhost:11434
 ```
 
-## Advanced Usage
+## 📊 Sistem Statistikası
 
-### Custom Entity Types
+| Komponent | Miqdar | Status |
+|-----------|--------|--------|
+| PDF Sənədləri | 6 | ✅ Yüklənib |
+| Neo4j Nodes | 24 | ✅ Aktiv |
+| Neo4j Relationships | 2 | ✅ Aktiv |
+| Pinecone Vectors | 47 | ✅ Aktiv |
+| Chunks İşlənib | 28 | ✅ Tamamlandı |
 
-Modify entity types in `handlers/neo4j_handler.py`:
+## 🛠️ Əlavə Skriptlər
 
-```python
-entity_types = ["Crop", "Disease", "Pest", "Technique", "Chemical", "YourType"]
+### Sistem Testi
+```bash
+python scripts/test_simple.py
+```
+Neo4j, Pinecone, Ollama və PDF oxuma qabiliyyətini yoxlayır.
+
+### Yeni Sənədləri Yükləmək
+```bash
+# PDFs əlavə edin: dataset/ qovluğuna
+python scripts/ingest_all_docs.py
 ```
 
-### Adjust Chunking
-
-Modify chunking parameters:
-
-```python
-chunker = DocumentChunker(
-    chunk_size=1000,      # Larger for more context
-    chunk_overlap=200      # More overlap for continuity
-)
-```
-
-### Customize Retrieval
-
-```python
-answer = graph_rag.query(
-    question,
-    top_k_vector=10,      # More vector results
-    top_k_graph=20,       # More graph results
-    return_context=True   # Get retrieval details
-)
-```
-
-## Troubleshooting
-
-### Ollama Not Running
+## 🐳 Docker Əmrləri
 
 ```bash
-# Start Ollama
-ollama serve
+# Başlat
+docker-compose up -d
 
-# In another terminal, verify it's running
-ollama list
+# Logları izlə
+docker-compose logs -f
+
+# Dayandır
+docker-compose down
+
+# Yenidən qur
+docker-compose up -d --build
+
+# Ollama modelləri
+docker exec -it agribot-ollama ollama list
+docker exec -it agribot-ollama ollama pull gemma:2b
 ```
 
-### Neo4j Connection Error
+## 📝 API Endpointləri
 
-Wait 60 seconds after creating the Aura instance, or check status at [console.neo4j.io](https://console.neo4j.io)
+| Endpoint | Method | Təsvir |
+|----------|--------|--------|
+| `/` | GET | Ana səhifə |
+| `/search` | POST | Axtarış sorğusu |
+| `/stats` | GET | Sistem statistikası |
 
-### Pinecone API Error
+## 🔒 Təhlükəsizlik
 
-Verify your API key in `.env` is correct.
+- ✅ `.env` faylı Git-də ignore edilib
+- ✅ Neo4j və Pinecone şifrələri qorunur
+- ✅ `.gitignore` düzgün konfiqurasiya edilib
+- ⚠️ Production üçün şifrələri dəyişdirin!
 
-### Out of Memory
+## 🤝 Töhfə
 
-Reduce batch size or chunk size in the ingestion process.
+1. Fork edin
+2. Feature branch yaradın: `git checkout -b feature/yeni-xususiyyet`
+3. Commit edin: `git commit -m 'Yeni xüsusiyyət əlavə edildi'`
+4. Push edin: `git push origin feature/yeni-xususiyyet`
+5. Pull Request açın
 
-## Examples
+## 📄 Lisenziya
 
-### Example 1: Agriculture Q&A
+Bu layihə MIT lisenziyası altındadır.
 
-```python
-questions = [
-    "What are common wheat diseases?",
-    "How to prevent pest damage in crops?",
-    "What fertilizers are recommended for grain cultivation?"
-]
+## 👤 Müəllif
 
-for q in questions:
-    answer = graph_rag.query(q)
-    print(f"Q: {q}\nA: {answer}\n")
-```
+**Ismat Samadov**
+- GitHub: [@Ismat-Samadov](https://github.com/Ismat-Samadov)
+- Email: ismetsemedov@gmail.com
 
-### Example 2: Entity Exploration
+## 🙏 Təşəkkürlər
 
-```python
-# Find all diseases
-diseases = graph_rag.neo4j.execute_cypher(
-    "MATCH (n:Disease) RETURN n.name as name, n.description as description"
-)
+- **Neo4j Aura** - Qrafik verilənlər bazası
+- **Pinecone** - Vektor verilənlər bazası
+- **Ollama** - Local LLM runtime
+- **FastAPI** - Modern web framework
 
-for disease in diseases:
-    print(f"{disease['name']}: {disease['description']}")
-```
+---
 
-### Example 3: Graph Visualization
-
-Use Neo4j Browser at your Aura instance URL:
-
-```cypher
-// Visualize crop-disease relationships
-MATCH (c:Crop)-[r]->(d:Disease)
-RETURN c, r, d
-LIMIT 25
-```
-
-## Performance Tips
-
-1. **Create Indexes**: Done automatically on first run
-2. **Batch Processing**: Ingest documents in batches
-3. **Cache Results**: Use conversation history for context
-4. **Adjust Top-K**: Lower values for faster responses
-
-## License
-
-MIT License
-
-## Contributing
-
-Contributions welcome! Please submit issues and pull requests.
-
-## Support
-
-For issues and questions, please check:
-- [Neo4j Documentation](https://neo4j.com/docs/)
-- [Pinecone Documentation](https://docs.pinecone.io/)
-- [Ollama Documentation](https://ollama.ai/docs)
+**Qeyd**: Bu sistem Azərbaycan kənd təsərrüfatı sənədləri üzərində işləyir və Azərbaycan dilində sorğuları dəstəkləyir.

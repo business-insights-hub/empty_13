@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>🌾 Kənd Təsərrüfatı Bilgi Sistemi</h1>
+    <p class="subtitle">Azərbaycan dilində kənd təsərrüfatı suallarınızı verin</p>
+</div>
+
+<div class="search-section">
+    <form action="/search" method="post" class="search-form">
+        <div class="search-box">
+            <textarea
+                name="query"
+                placeholder="Məsələn: Taxılın xəstəlikləri haqqında məlumat verin..."
+                rows="4"
+                required
+            ></textarea>
+            <button type="submit" class="btn-primary">
+                🔍 Axtar
+            </button>
+        </div>
+    </form>
+
+    <div class="example-queries">
+        <p><strong>Nümunə suallar:</strong></p>
+        <ul>
+            <li>Taxılın əsas xəstəlikləri hansılardır?</li>
+            <li>Bitkiçilikdə hansı metodlar tətbiq olunur?</li>
+            <li>Kənd təsərrüfatında istifadə olunan kimyəvi maddələr</li>
+        </ul>
+    </div>
+</div>
+
+<div class="stats-cards">
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.neo4j_nodes }}</div>
+        <div class="stat-label">Məlumat Vahidi</div>
+        <div class="stat-description">Neo4j Graph</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.neo4j_relationships }}</div>
+        <div class="stat-label">Əlaqələr</div>
+        <div class="stat-description">Qrafik Əlaqələri</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.pinecone_vectors }}</div>
+        <div class="stat-label">Vektorlar</div>
+        <div class="stat-description">Pinecone DB</div>
+    </div>
+</div>
+
+<div class="info-section">
+    <h2>🎯 Sistemin İmkanları</h2>
+    <div class="features">
+        <div class="feature">
+            <h3>📚 Geniş Məlumat Bazası</h3>
+            <p>6 kənd təsərrüfatı sənədi üzərində işləyir</p>
+        </div>
+        <div class="feature">
+            <h3>🔗 Qrafik Texnologiyası</h3>
+            <p>Məlumatlar arasında əlaqələri tapır</p>
+        </div>
+        <div class="feature">
+            <h3>🤖 AI Köməkçisi</h3>
+            <p>Ollama LLM ilə ağıllı cavablar</p>
+        </div>
+        <div class="feature">
+            <h3>🎯 Vektor Axtarışı</h3>
+            <p>Semantik oxşarlıq əsasında axtarış</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

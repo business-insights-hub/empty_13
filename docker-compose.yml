@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  agribot:
+    build: .
+    container_name: agribot-web
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./dataset:/app/dataset:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    networks:
+      - agribot-network
+
+  # Optional: Run Ollama in Docker (alternative to host installation)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: agribot-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - agribot-network
+    # Note: GPU support requires additional configuration
+    # For GPU:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama-data:
+    driver: local
+
+networks:
+  agribot-network:
+    driver: bridge
+
+# Usage:
+# 1. Build and start: docker-compose up -d
+# 2. Pull Ollama model: docker exec -it agribot-ollama ollama pull gemma:2b
+# 3. View logs: docker-compose logs -f
+# 4. Stop: docker-compose down
+# 5. Access: http://localhost:8000

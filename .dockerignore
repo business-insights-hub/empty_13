@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation and tests
+README.md
+SETUP.md
+test_simple.py
+demo_graph_rag.py
+ingest_all_docs.py
+
+# Logs
+*.log
+
+# Environment
+.env.example
+
+# Temporary files
+*.tmp
+*.bak
